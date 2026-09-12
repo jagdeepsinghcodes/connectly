@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#6d4aff">
+<title>Connectly — Connect, share, belong.</title>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --brand:#6d4aff;--brand2:#8b5cf6;--bg:#f4f5f8;--surface:#fff;--surface2:#f0f1f5;
+  --text:#171821;--muted:#737684;--border:#e5e6eb;--danger:#ef4444;--shadow:0 8px 30px rgba(24,25,35,.07);
+  --radius:20px;
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+body.dark{--bg:#0f1015;--surface:#171922;--surface2:#22242e;--text:#f6f7fb;--muted:#a8abb7;--border:#30333e;--shadow:0 10px 35px rgba(0,0,0,.25)}
+button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}
+a{color:inherit;text-decoration:none}.app{min-height:100vh}.shell{max-width:1250px;margin:auto;padding:0 18px}
+.topbar{height:68px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;position:sticky;top:0;z-index:30}
+.topbar .inner{width:100%;max-width:1250px;margin:auto;padding:0 18px;display:flex;align-items:center;gap:18px}
+.logo{font-size:27px;font-weight:900;letter-spacing:-1.2px;color:var(--brand)}.logo small{display:block;font-size:9px;letter-spacing:1.8px;color:var(--muted);font-weight:800;margin-top:-4px}
+.searchbox{flex:1;max-width:430px;position:relative}.searchbox input{width:100%;border:0;outline:0;background:var(--surface2);border-radius:14px;padding:11px 14px 11px 40px;color:var(--text)}
+.searchbox i{position:absolute;left:13px;top:11px;color:var(--muted)}
+.top-actions{margin-left:auto;display:flex;gap:6px}.iconbtn{width:42px;height:42px;border-radius:13px;background:transparent;color:var(--text);display:grid;place-items:center}.iconbtn:hover{background:var(--surface2)}
+.badge{position:absolute;background:#ef4444;color:white;border-radius:99px;font-size:10px;padding:2px 5px;top:2px;right:2px;border:2px solid var(--surface)}
+.layout{display:grid;grid-template-columns:230px minmax(0,650px) 280px;gap:24px;align-items:start;padding-top:22px}
+.sidebar,.rightbar{position:sticky;top:90px}.nav{display:flex;flex-direction:column;gap:5px}.nav button{background:transparent;color:var(--text);padding:13px 14px;border-radius:14px;text-align:left;display:flex;gap:13px;align-items:center;font-weight:700}.nav button:hover,.nav button.active{background:var(--surface);box-shadow:var(--shadow)}.nav button.active{color:var(--brand)}
+.mini-profile{background:var(--surface);border-radius:18px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:14px;box-shadow:var(--shadow)}
+.avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#d9d0ff,#7c5cff);display:grid;place-items:center;color:#fff;font-weight:800;overflow:hidden;flex:none}.avatar.sm{width:36px;height:36px}.avatar.lg{width:86px;height:86px}.avatar.xl{width:110px;height:110px}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px}
+.stories{padding:15px 10px;display:flex;gap:15px;overflow:auto;scrollbar-width:none}.stories::-webkit-scrollbar{display:none}.story{width:72px;flex:none;text-align:center;font-size:12px}.storyring{width:62px;height:62px;border-radius:50%;padding:3px;margin:auto;background:linear-gradient(135deg,#6d4aff,#c026d3,#f59e0b)}.storyring.viewed{background:#c9cad0}.storyinner{width:100%;height:100%;border-radius:50%;background:var(--surface);padding:3px}.storyinner .avatar{width:100%;height:100%}.story b{display:block;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.composer{padding:15px}.composer-top{display:flex;gap:11px;align-items:center}.composer-input{flex:1;background:var(--surface2);border:0;border-radius:22px;padding:13px 17px;color:var(--muted);text-align:left}.composer-actions{display:flex;justify-content:space-around;border-top:1px solid var(--border);margin-top:13px;padding-top:10px}.composer-actions button{background:transparent;color:var(--muted);font-weight:750;padding:8px 14px;border-radius:10px}.composer-actions button:hover{background:var(--surface2);color:var(--text)}
+.post-head{display:flex;align-items:center;gap:11px;padding:14px}.post-meta{flex:1}.post-meta strong{display:block}.post-meta span{font-size:12px;color:var(--muted)}.more{background:transparent;color:var(--muted);padding:7px;border-radius:10px}.more:hover{background:var(--surface2)}
+.post-media{width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,#ddd,#fafafa);object-fit:cover;display:block}.post-media.video{object-fit:cover}.post-body{padding:10px 14px 14px}.post-actions{display:flex;gap:5px}.post-actions button{background:transparent;color:var(--text);padding:6px;border-radius:10px}.post-actions button:hover{background:var(--surface2)}.post-actions .save{margin-left:auto}.post-actions .liked{color:#ef476f}.post-actions .saved{color:var(--brand)}.likes{font-weight:800;font-size:14px;margin-top:5px}.caption{margin-top:6px;line-height:1.45}.caption strong{margin-right:5px}.tags{color:var(--brand);margin-top:5px}.comments-link{background:transparent;color:var(--muted);padding:0;margin-top:7px}.comment-row{display:flex;gap:8px;margin-top:10px}.comment-row input{flex:1;border:0;background:var(--surface2);border-radius:14px;padding:10px 12px;outline:none;color:var(--text)}.comment-row button{background:var(--brand);color:#fff;border-radius:12px;padding:0 12px;font-weight:700}
+.right-card{padding:15px}.right-card h3{font-size:14px;margin:0 0 12px}.person{display:flex;align-items:center;gap:9px;margin:11px 0}.person .grow{flex:1}.follow{background:var(--brand);color:#fff;border-radius:10px;padding:7px 11px;font-size:12px;font-weight:800}.follow.secondary{background:var(--surface2);color:var(--text)}
+.view{padding-bottom:70px}.view-title{display:flex;align-items:center;justify-content:space-between;margin:3px 0 15px}.view-title h1{font-size:24px;margin:0}.btn{background:var(--brand);color:#fff;border-radius:12px;padding:10px 15px;font-weight:800}.btn.secondary{background:var(--surface2);color:var(--text)}.btn.danger{background:#fee2e2;color:#b91c1c}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.grid img,.grid .tile{width:100%;aspect-ratio:1/1;object-fit:cover;background:linear-gradient(135deg,#ddd,#fff);cursor:pointer}.grid .wide{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+.profile-card{padding:20px}.profile-top{display:flex;gap:24px;align-items:center}.profile-info{flex:1}.profile-info h1{margin:0;font-size:23px}.profile-info p{color:var(--muted);margin:7px 0}.stats{display:flex;gap:22px;margin:12px 0}.stats b{display:block;font-size:17px}.stats span{font-size:12px;color:var(--muted)}.tabs{display:flex;border-top:1px solid var(--border);margin-top:20px}.tabs button{flex:1;padding:14px;background:transparent;color:var(--muted);font-weight:800}.tabs button.active{color:var(--brand);border-bottom:2px solid var(--brand)}
+.chat-layout{display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 110px);min-height:550px}.chat-list{border-right:1px solid var(--border);overflow:auto}.chat-item{padding:12px;display:flex;gap:9px;align-items:center;cursor:pointer}.chat-item:hover,.chat-item.active{background:var(--surface2)}.chat-item .grow{flex:1;min-width:0}.chat-item small{color:var(--muted)}.chat-window{display:flex;flex-direction:column}.chat-head{padding:12px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}.messages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:8px}.bubble{max-width:72%;padding:10px 13px;border-radius:17px;background:var(--surface2);align-self:flex-start}.bubble.mine{align-self:flex-end;background:var(--brand);color:white;border-bottom-right-radius:5px}.bubble:not(.mine){border-bottom-left-radius:5px}.bubble time{display:block;font-size:9px;opacity:.65;margin-top:3px}.chat-input{padding:10px;border-top:1px solid var(--border);display:flex;gap:8px}.chat-input input{flex:1;border:0;background:var(--surface2);border-radius:20px;padding:12px 15px;outline:0;color:var(--text)}.chat-input button{width:44px;border-radius:50%;background:var(--brand);color:#fff}
+.notification{display:flex;gap:10px;padding:13px;border-bottom:1px solid var(--border)}.notification.unread{background:rgba(109,74,255,.06)}.notification .grow{flex:1}.notification p{margin:0;line-height:1.4}.notification small{color:var(--muted)}
+.reel{position:relative;background:#090a0f;border-radius:18px;overflow:hidden;height:min(78vh,720px);display:flex;align-items:center;justify-content:center;margin-bottom:18px}.reel video,.reel img{width:100%;height:100%;object-fit:cover}.reel-gradient{position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(0,0,0,.72))}.reel-info{position:absolute;left:15px;right:70px;bottom:18px;color:#fff}.reel-actions{position:absolute;right:10px;bottom:15px;display:flex;flex-direction:column;gap:10px}.reel-actions button{width:45px;height:45px;border-radius:50%;background:rgba(0,0,0,.42);color:#fff}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:grid;place-items:center;z-index:100;padding:18px}.modalbox{width:min(560px,100%);max-height:92vh;overflow:auto;background:var(--surface);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.25)}.modalhead{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}.modalhead h2{margin:0;font-size:19px}.modalbody{padding:18px}.field{margin-bottom:13px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:6px;color:var(--muted)}.field input,.field textarea,.field select{width:100%;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:13px;padding:12px;outline:none}.field textarea{min-height:100px;resize:vertical}.preview{width:100%;max-height:350px;object-fit:contain;border-radius:15px;background:var(--surface2);margin-bottom:12px}.modalfoot{display:flex;gap:8px;justify-content:flex-end;padding:0 18px 18px}
+.auth{min-height:100vh;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 10% 10%,#e8e0ff,transparent 30%),radial-gradient(circle at 90% 80%,#dffbff,transparent 30%),var(--bg)}.authbox{width:min(430px,100%);background:var(--surface);border:1px solid var(--border);border-radius:28px;padding:24px;box-shadow:0 25px 70px rgba(40,35,75,.14)}.authlogo{text-align:center;margin:4px 0 25px}.authlogo .logo{font-size:34px}.authlogo p{color:var(--muted);margin:5px 0}.auth-tabs{display:flex;background:var(--surface2);padding:4px;border-radius:13px;margin-bottom:18px}.auth-tabs button{flex:1;padding:10px;border-radius:10px;background:transparent;color:var(--muted);font-weight:800}.auth-tabs button.active{background:var(--surface);color:var(--brand);box-shadow:var(--shadow)}.auth-note{font-size:12px;color:var(--muted);line-height:1.5;text-align:center;margin-top:15px}.password-wrap{position:relative}.password-wrap input{padding-right:45px}.password-wrap button{position:absolute;right:5px;top:4px;width:38px;height:38px;border-radius:10px;background:transparent;color:var(--muted)}.auth-message{padding:10px;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:13px;margin-bottom:12px}.backend-dot{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-top:8px}.dot{width:7px;height:7px;border-radius:50%;background:#f59e0b}.dot.live{background:#22c55e}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:#171821;color:#fff;padding:11px 15px;border-radius:13px;z-index:200;opacity:0;pointer-events:none;transition:.25s;box-shadow:0 10px 30px rgba(0,0,0,.2);font-size:13px}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.bottomnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:50;padding:7px max(8px,env(safe-area-inset-left)) max(7px,env(safe-area-inset-bottom));justify-content:space-around}.bottomnav button{background:transparent;color:var(--muted);width:20%;height:48px;border-radius:13px;display:grid;place-items:center}.bottomnav button.active{color:var(--brand)}
+.storyviewer{position:fixed;inset:0;background:#050509;z-index:150;display:flex;align-items:center;justify-content:center}.story-card{height:min(92vh,800px);width:min(450px,100%);position:relative;background:#111;border-radius:18px;overflow:hidden}.story-card img{width:100%;height:100%;object-fit:cover}.storybar{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:4px;z-index:2}.storyseg{height:3px;background:rgba(255,255,255,.35);flex:1;border-radius:4px;overflow:hidden}.storyseg span{display:block;height:100%;background:#fff;width:0}.storyseg.done span{width:100%}.storytop{position:absolute;top:23px;left:15px;right:15px;color:#fff;display:flex;align-items:center;gap:8px;z-index:3}.storytop .grow{flex:1}.storytop button{background:rgba(0,0,0,.35);color:#fff;width:38px;height:38px;border-radius:50%}.storyclick{position:absolute;top:70px;bottom:0;width:50%;z-index:2}.storyclick.prev{left:0}.storyclick.next{right:0}
+.empty{text-align:center;padding:45px 20px;color:var(--muted)}.empty i{margin-bottom:8px}.small{font-size:12px;color:var(--muted)}
+@media(max-width:1000px){.layout{grid-template-columns:75px minmax(0,650px);justify-content:center}.rightbar{display:none}.nav button{justify-content:center;font-size:0}.nav button i{width:23px;height:23px}.mini-profile{justify-content:center}.mini-profile .grow{display:none}}
+@media(max-width:720px){
+ .topbar{height:60px}.topbar .inner{padding:0 12px}.logo{font-size:24px}.searchbox{display:none}.top-actions{gap:0}.top-actions .optional{display:none}
+ .layout{display:block;padding:10px 0 75px}.sidebar{display:none}.shell{padding:0 10px}.card{border-radius:17px;margin-bottom:12px}
+ .bottomnav{display:flex}.stories{padding:12px 8px;gap:12px}.story{width:66px}.storyring{width:57px;height:57px}
+ .composer-actions button{font-size:12px;padding:8px 5px}.post-media{aspect-ratio:4/5}.profile-top{gap:13px}.avatar.xl{width:82px;height:82px}.stats{gap:14px}
+ .chat-layout{height:calc(100vh - 72px);min-height:0;display:block}.chat-list{border-right:0}.chat-window{position:fixed;inset:60px 0 68px;background:var(--surface);z-index:40}.chat-window.hidden{display:none!important}.chat-list.hidden{display:none}.chat-head{min-height:58px}.view-title{padding:0 3px}.grid{gap:2px}
+ .reel{height:calc(100vh - 130px);border-radius:0;margin-left:-10px;margin-right:-10px}.modal{padding:8px}.modalbox{border-radius:18px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+const SUPABASE_URL = "";       // Add your Supabase project URL for real multi-user mode.
+const SUPABASE_ANON_KEY = ""; // Add your Supabase anon/public key for real multi-user mode.
+const HAS_BACKEND = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+const sb = HAS_BACKEND ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY) : null;
+
+const KEY="connectly_local_v3";
+const state={
+ user:null, view:"home", posts:[], users:[], follows:[], comments:[], notifications:[], conversations:[], messages:[],
+ saved:[], stories:[], theme:localStorage.getItem("connectly_theme")||"light", search:"",
+ selectedChat:null, selectedStory:0, storyTimer:null, authMode:"login", pendingFile:null
+};
+
+const seedUsers=[
+ {id:"u_alex",username:"alex",name:"Alex",bio:"Beautiful days ✨ | Exploring the world",avatar:"",followers:1245,following:220},
+ {id:"u_rahul",username:"rahul",name:"Rahul",bio:"Making memories.",avatar:"",followers:384,following:190},
+ {id:"u_aman",username:"aman",name:"Aman",bio:"Fitness • travel • music",avatar:"",followers:728,following:145},
+ {id:"u_priya",username:"priya",name:"Priya",bio:"Smile more 🌸",avatar:"",followers:910,following:312},
+ {id:"u_riya",username:"riya",name:"Riya",bio:"Coffee & sunsets ☕",avatar:"",followers:602,following:280}
+];
+function svgData(text, a="#6d4aff", b="#d8ccff"){
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="900" height="900" fill="url(#g)"/><circle cx="700" cy="150" r="160" fill="rgba(255,255,255,.14)"/><circle cx="160" cy="720" r="220" fill="rgba(255,255,255,.10)"/><text x="450" y="455" text-anchor="middle" fill="white" font-family="Arial" font-size="60" font-weight="700">${text}</text></svg>`;
+ return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
+}
+const demoPosts=[
+ {id:"p1",user_id:"u_alex",caption:"Beautiful day in the hills 🌄",hashtags:"#travel #connectly",location:"Hollywood Hills",media_url:svgData("A beautiful day","#a78bfa","#f5d0fe"),media_type:"image",created_at:Date.now()-7200000,likes:1245,liked:false,saved:false,comments_count:18},
+ {id:"p2",user_id:"u_priya",caption:"Coffee, sunshine and good vibes ☕✨",hashtags:"#goodvibes",location:"Cafe",media_url:svgData("Good vibes","#fb7185","#fbbf24"),media_type:"image",created_at:Date.now()-17200000,likes:582,liked:false,saved:false,comments_count:12},
+ {id:"p3",user_id:"u_aman",caption:"Small steps every day 💪",hashtags:"#fitness",location:"Gym",media_url:svgData("Keep going","#22c55e","#06b6d4"),media_type:"image",created_at:Date.now()-86400000,likes:341,liked:false,saved:false,comments_count:9}
+];
+const demoStories=seedUsers.slice(0,5).map((u,i)=>({id:"s"+i,user_id:u.id,media_url:svgData(u.name,"#6d4aff",["#f9a8d4","#93c5fd","#86efac","#fde68a"][i%4]),created_at:Date.now()-i*3600000,viewed:false}));
+
+function uid(p="id"){return p+Math.random().toString(36).slice(2)+Date.now().toString(36)}
+function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function icon(n,size=19){return `<i data-lucide="${n}" width="${size}" height="${size}"></i>`}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2300)}
+function saveLocal(){localStorage.setItem(KEY,JSON.stringify({user:state.user,posts:state.posts,users:state.users,follows:state.follows,comments:state.comments,notifications:state.notifications,conversations:state.conversations,messages:state.messages,saved:state.saved,stories:state.stories}))}
+function loadLocal(){
+ try{
+  const x=JSON.parse(localStorage.getItem(KEY)||"null");
+  if(x){Object.assign(state,x)}
+ }catch{}
+ if(!state.users?.length) state.users=seedUsers.map(x=>({...x}));
+ if(!state.posts?.length) state.posts=demoPosts.map(x=>({...x}));
+ if(!state.stories?.length) state.stories=demoStories.map(x=>({...x}));
+ state.comments=state.comments||[];state.follows=state.follows||[];state.notifications=state.notifications||[];state.conversations=state.conversations||[];state.messages=state.messages||[];state.saved=state.saved||[];
+}
+function currentUser(){return state.user}
+function userById(id){return state.users.find(u=>u.id===id)||{id,username:"connectly",name:"Connectly User",bio:"",avatar:""}}
+function avatar(u,cls="avatar"){return `<div class="${cls}">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:esc((u.name||u.username||"C").slice(0,1).toUpperCase())}</div>`}
+function formatTime(ts){const d=Date.now()-new Date(ts).getTime(),m=Math.floor(d/60000);if(m<1)return"now";if(m<60)return m+"m";const h=Math.floor(m/60);if(h<24)return h+"h";const days=Math.floor(h/24);if(days<7)return days+"d";return new Date(ts).toLocaleDateString()}
+function ensureUser(){
+ if(!state.user)return;
+ if(!state.users.some(u=>u.id===state.user.id)){
+   state.users.push({...state.user,followers:0,following:0,posts:0});
+ }
+}
+function applyTheme(){document.body.classList.toggle("dark",state.theme==="dark")}
+function navItems(){return [
+ ["home","Home","house"],["search","Search","search"],["explore","Explore","compass"],["reels","Reels","clapperboard"],["messages","Messages","message-circle"],["notifications","Notifications","bell"],["create","Create","plus-square"],["profile","Profile","user-round"],["settings","Settings","settings"]
+]}
+function setView(v){state.view=v;if(v!=="messages")state.selectedChat=null;render()}
+function render(){
+ applyTheme();
+ document.getElementById("root").innerHTML=state.user?appHTML():authHTML();
+ if(state.user) afterRender();
+ lucide.createIcons();
+}
+function authHTML(){
+ return `<main class="auth"><section class="authbox">
+  <div class="authlogo"><div class="logo">Connectly<small>CONNECT • SHARE • BELONG</small></div><p>Meet people. Share moments. Stay connected.</p>
+   <div class="backend-dot"><span class="dot ${HAS_BACKEND?"live":""}"></span>${HAS_BACKEND?"Cloud account mode":"Browser demo mode"}</div>
+  </div>
+  <div class="auth-tabs"><button class="${state.authMode==="login"?"active":""}" onclick="switchAuth('login')">Log in</button><button class="${state.authMode==="signup"?"active":""}" onclick="switchAuth('signup')">Create account</button></div>
+  <div id="authMsg" class="auth-message hidden"></div>
+  <form onsubmit="handleAuth(event)">
+   ${state.authMode==="signup"?`<div class="field"><label>Full name</label><input id="authName" required placeholder="Your name"></div><div class="field"><label>Username</label><input id="authUsername" required pattern="[A-Za-z0-9_.]{3,30}" placeholder="yourname"></div>`:""}
+   <div class="field"><label>Email or username</label><input id="authEmail" required placeholder="Email or username"></div>
+   <div class="field"><label>Password</label><div class="password-wrap"><input id="authPassword" type="password" minlength="6" required placeholder="At least 6 characters"><button type="button" onclick="togglePassword()">${icon("eye",18)}</button></div></div>
+   <button class="btn" style="width:100%;padding:13px">${state.authMode==="login"?"Log in":"Create my Connectly account"}</button>
+  </form>
+  ${state.authMode==="login"?`<button class="btn secondary" style="width:100%;margin-top:10px" onclick="forgotPassword()">Forgot password?</button>`:""}
+  <p class="auth-note">${HAS_BACKEND?"Your account can be used from other phones and computers after backend setup.":"This preview uses this browser only. Connect Supabase in the code to make accounts, posts and chats shared between users."}</p>
+ </section></main>`;
+}
+function switchAuth(m){state.authMode=m;render()}
+function showAuthMsg(m){const e=document.getElementById("authMsg");if(e){e.textContent=m;e.classList.remove("hidden")}}
+function togglePassword(){const e=document.getElementById("authPassword");if(e)e.type=e.type==="password"?"text":"password"}
+async function handleAuth(ev){
+ ev.preventDefault();
+ const email=document.getElementById("authEmail").value.trim().toLowerCase(), password=document.getElementById("authPassword").value;
+ if(HAS_BACKEND){
+  if(state.authMode==="signup"){
+   const name=document.getElementById("authName").value.trim(),username=document.getElementById("authUsername").value.trim().toLowerCase();
+   const {data:exists}=await sb.from("profiles").select("id").eq("username",username).maybeSingle();
+   if(exists){showAuthMsg("That username is already taken.");return}
+   const {data,error}=await sb.auth.signUp({email,password,options:{data:{username,name}}});
+   if(error){showAuthMsg(error.message);return}
+   if(data.user){state.user={id:data.user.id,email,username,name,avatar:"",bio:"",followers:0,following:0};await sb.from("profiles").upsert({id:data.user.id,username,name,bio:"",avatar_url:""});saveLocal();toast("Account created");render()}
+  }else{
+   let loginEmail=email;
+   const {data:byName}=await sb.from("profiles").select("id,username").eq("username",email).maybeSingle();
+   if(byName){showAuthMsg("For security, sign in with your email address.");return}
+   const {data,error}=await sb.auth.signInWithPassword({email:loginEmail,password});
+   if(error){showAuthMsg(error.message);return}
+   await loadCloudUser(data.user);toast("Welcome back");render();
+  }
+ }else{
+   const name=state.authMode==="signup"?document.getElementById("authName").value.trim():"Alex";
+   const username=state.authMode==="signup"?document.getElementById("authUsername").value.trim().toLowerCase():"alex";
+   if(state.authMode==="login"){
+    const local=JSON.parse(localStorage.getItem("connectly_accounts")||"[]");
+    let acc=local.find(a=>(a.email===email||a.username===email||a.username===email.replace(/^@/,""))&&a.password===password);
+    if(!acc && (email==="alex" || email==="alex@connectly.app") && password==="connectly"){
+      acc={id:"u_alex",email:"alex@connectly.app",name:"Alex",username:"alex",avatar:"",bio:"Beautiful days ✨ | Exploring the world",followers:0,following:0};
+      if(!local.some(a=>a.username==="alex")){local.push({...acc,password});localStorage.setItem("connectly_accounts",JSON.stringify(local));}
+    }
+    if(!acc){showAuthMsg("Login failed. Use alex / connectly, or create a new account first.");return}
+    state.user=acc;
+   }else{
+    const local=JSON.parse(localStorage.getItem("connectly_accounts")||"[]");
+    if(local.some(a=>a.email===email)){showAuthMsg("An account with that email already exists.");return}
+    const acc={id:uid("u_"),email,name,username,avatar:"",bio:"",followers:0,following:0};
+    local.push({...acc,password});localStorage.setItem("connectly_accounts",JSON.stringify(local));state.user=acc;state.users.push(acc);
+   }
+   ensureUser();saveLocal();toast("Logged in");render();
+ }
+}
+async function loadCloudUser(au){
+ const {data:p}=await sb.from("profiles").select("*").eq("id",au.id).single();
+ state.user={id:au.id,email:au.email,username:p?.username||au.user_metadata?.username||"user",name:p?.name||au.user_metadata?.name||"Connectly User",bio:p?.bio||"",avatar:p?.avatar_url||"",followers:0,following:0};
+ ensureUser();saveLocal();
+}
+async function forgotPassword(){
+ if(!HAS_BACKEND){showAuthMsg("Password reset needs Supabase cloud mode. Create a demo account to test login.");return}
+ const email=document.getElementById("authEmail").value.trim();if(!email){showAuthMsg("Enter your email first.");return}
+ const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+ if(error)showAuthMsg(error.message);else showAuthMsg("Password reset email sent.");
+}
+async function logout(){if(HAS_BACKEND)await sb.auth.signOut();state.user=null;localStorage.removeItem(KEY);toast("Logged out");render()}
+
+function shellHTML(content){
+ const unread=state.notifications.filter(n=>!n.read).length;
+ return `<div class="app">
+ <header class="topbar"><div class="inner"><button class="iconbtn" onclick="setView('home')" style="display:none" id="mobileBack">${icon("arrow-left")}</button><div class="logo">Connectly</div>
+  <div class="searchbox">${icon("search",18)}<input value="${esc(state.search)}" oninput="globalSearch(this.value)" placeholder="Search people, posts, #hashtags"></div>
+  <div class="top-actions">
+   <button class="iconbtn" onclick="setView('messages')" title="Messages">${icon("message-circle")}</button>
+   <button class="iconbtn optional" onclick="setView('notifications')" style="position:relative" title="Notifications">${icon("bell")}${unread?`<span class="badge">${unread}</span>`:""}</button>
+   <button class="iconbtn" onclick="setView('profile')" title="Profile">${icon("user-round")}</button>
+  </div>
+ </div></header>
+ <div class="shell layout">
+  <aside class="sidebar"><div class="mini-profile">${avatar(state.user)}<div class="grow"><b>${esc(state.user.name)}</b><div class="small">@${esc(state.user.username)}</div></div></div><nav class="nav">${navItems().map(n=>`<button class="${state.view===n[0]?"active":""}" onclick="setView('${n[0]}')">${icon(n[2])}<span>${n[1]}</span></button>`).join("")}</nav></aside>
+  <main class="view">${content}</main>
+  <aside class="rightbar">${rightbar()}</aside>
+ </div>
+ <nav class="bottomnav">${[["home","house"],["explore","compass"],["create","plus-square"],["reels","clapperboard"],["profile","user-round"]].map(n=>`<button class="${state.view===n[0]?"active":""}" onclick="setView('${n[0]}')">${icon(n[1])}</button>`).join("")}</nav>
+ </div>`;
+}
+function rightbar(){
+ const suggestions=state.users.filter(u=>u.id!==state.user.id).slice(0,3);
+ return `<div class="right-card card"><h3>People you may know</h3>${suggestions.map(u=>`<div class="person">${avatar(u,"avatar sm")}<div class="grow"><b>${esc(u.username)}</b><div class="small">${esc(u.name)}</div></div><button class="follow ${isFollowing(u.id)?"secondary":""}" onclick="toggleFollow('${u.id}')">${isFollowing(u.id)?"Following":"Follow"}</button></div>`).join("")}</div>
+ <div class="right-card card"><h3>Connectly</h3><div class="small">Share moments, find friends and build your community. Your profile starts with <b>0 followers</b> and <b>0 posts</b> when you create a new account.</div></div>`;
+}
+function afterRender(){
+ if(state.view==="home")renderHome();
+ else if(state.view==="search")renderSearch();
+ else if(state.view==="explore")renderExplore();
+ else if(state.view==="profile")renderProfile();
+ else if(state.view==="notifications")renderNotifications();
+ else if(state.view==="messages")renderMessages();
+ else if(state.view==="reels")renderReels();
+ else if(state.view==="settings")renderSettings();
+ else if(state.view==="create")openCreateModal();
+}
+function mount(content){document.querySelector(".view").innerHTML=content;lucide.createIcons()}
+function renderHome(){
+ const stories=state.stories.filter(s=>userById(s.user_id));
+ const posts=[...state.posts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+ mount(`<div class="card stories">${`<div class="story" onclick="openCreateStory()"><div class="storyring"><div class="storyinner">${avatar(state.user,"avatar")}</div></div><b>Your Story</b></div>`}${stories.map(s=>{const u=userById(s.user_id);return `<div class="story" onclick="openStory('${s.id}')"><div class="storyring ${s.viewed?'viewed':''}"><div class="storyinner">${avatar(u,"avatar")}</div></div><b>${esc(u.name)}</b></div>`}).join("")}</div>
+ <div class="card composer"><div class="composer-top">${avatar(state.user,"avatar sm")}<button class="composer-input" onclick="openCreateModal()">What's on your mind, ${esc(state.user.name.split(" ")[0])}?</button></div><div class="composer-actions"><button onclick="openCreateModal('image')">${icon("image",17)} Photo</button><button onclick="openCreateModal('video')">${icon("video",17)} Video</button><button onclick="openCreateModal()">${icon("smile",17)} Feeling</button></div></div>
+ ${posts.length?posts.map(postHTML).join(""):`<div class="card empty">${icon("images",30)}<h3>Your feed is waiting</h3><p>Follow people or create your first post.</p><button class="btn" onclick="setView('explore')">Discover people</button></div>`}`);
+}
+function postHTML(p){
+ const u=userById(p.user_id), liked=Boolean(p.liked), saved=Boolean(p.saved);
+ const comments=state.comments.filter(c=>c.post_id===p.id).slice(-2);
+ return `<article class="card post" id="post-${esc(p.id)}">
+  <div class="post-head">${avatar(u,"avatar sm")}<div class="post-meta"><strong>${esc(u.name)} <span class="small">@${esc(u.username)}</span></strong><span>${formatTime(p.created_at)}${p.location?" · "+esc(p.location):""}</span></div><button class="more" onclick="postMenu('${p.id}')">${icon("more-horizontal")}</button></div>
+  ${p.media_type==="video"?`<video class="post-media video" src="${esc(p.media_url)}" controls playsinline></video>`:`<img class="post-media" src="${esc(p.media_url)}" alt="Post by ${esc(u.username)}">`}
+  <div class="post-body"><div class="post-actions">
+   <button class="${liked?"liked":""}" onclick="toggleLike('${p.id}')">${icon(liked?"heart":"heart",22)}</button>
+   <button onclick="focusComment('${p.id}')">${icon("message-circle",22)}</button>
+   <button onclick="sharePost('${p.id}')">${icon("send",22)}</button><button class="save ${saved?"saved":""}" onclick="toggleSave('${p.id}')">${icon(saved?"bookmark":"bookmark",22)}</button>
+  </div>
+  <div class="likes">${Number(p.likes||0).toLocaleString()} likes</div>
+  <div class="caption"><strong>${esc(u.username)}</strong>${esc(p.caption||"")}</div>
+  ${p.hashtags?`<div class="tags">${esc(p.hashtags)}</div>`:""}
+  <button class="comments-link" onclick="showComments('${p.id}')">View all ${p.comments_count||0} comments</button>
+  ${comments.map(c=>`<div class="comment-row"><div>${avatar(userById(c.user_id),"avatar sm")}</div><div class="grow"><b>${esc(userById(c.user_id).username)}</b> ${esc(c.text)}</div></div>`).join("")}
+  <div class="comment-row"><input id="comment-${esc(p.id)}" placeholder="Add a comment..." onkeydown="if(event.key==='Enter')addComment('${p.id}')"><button onclick="addComment('${p.id}')">Post</button></div>
+  </div></article>`;
+}
+function focusComment(id){const e=document.getElementById("comment-"+id);if(e){e.focus();e.scrollIntoView({behavior:"smooth",block:"center"})}}
+function showComments(id){focusComment(id)}
+function postMenu(id){if(confirm("Delete this post? This only deletes your own post.")){const p=state.posts.find(x=>x.id===id);if(p?.user_id===state.user.id){state.posts=state.posts.filter(x=>x.id!==id);saveLocal();render() }else toast("You can only delete your own posts.")}}
+function toggleLike(id){
+ const p=state.posts.find(x=>x.id===id);if(!p)return;p.liked=!p.liked;p.likes=Math.max(0,(p.likes||0)+(p.liked?1:-1));
+ if(p.liked&&p.user_id!==state.user.id)addNotification(p.user_id,"like",`liked your post.`);
+ saveLocal();render();
+}
+function toggleSave(id){const p=state.posts.find(x=>x.id===id);if(!p)return;p.saved=!p.saved;if(p.saved)state.saved.push(id);else state.saved=state.saved.filter(x=>x!==id);saveLocal();toast(p.saved?"Saved to your collection":"Removed from saved");render()}
+async function sharePost(id){
+ const url=location.href.split("#")[0]+"#post-"+id;
+ try{if(navigator.share)await navigator.share({title:"Connectly post",url});else{await navigator.clipboard.writeText(url);toast("Post link copied")}}catch{}
+}
+function addComment(id){
+ const e=document.getElementById("comment-"+id),text=e?.value.trim();if(!text)return;
+ state.comments.push({id:uid("c_"),post_id:id,user_id:state.user.id,text,created_at:Date.now()});
+ const p=state.posts.find(x=>x.id===id);if(p)p.comments_count=(p.comments_count||0)+1;
+ if(p&&p.user_id!==state.user.id)addNotification(p.user_id,"comment","commented on your post.");
+ e.value="";saveLocal();render();toast("Comment added");
+}
+function addNotification(to,type,text){state.notifications.unshift({id:uid("n_"),to_user_id:to,type,text,from_user_id:state.user.id,created_at:Date.now(),read:false})}
+function isFollowing(id){return state.follows.some(f=>f.follower_id===state.user.id&&f.following_id===id)}
+function toggleFollow(id){
+ if(id===state.user.id)return;const i=state.follows.findIndex(f=>f.follower_id===state.user.id&&f.following_id===id);
+ if(i>=0){state.follows.splice(i,1);toast("Unfollowed")}else{state.follows.push({id:uid("f_"),follower_id:state.user.id,following_id:id});addNotification(id,"follow","started following you.");toast("Following")}
+ saveLocal();render();
+}
+function globalSearch(v){state.search=v;if(v.trim())state.view="search";else if(state.view==="search")state.view="home";render()}
+function renderSearch(){
+ const q=state.search.trim().toLowerCase(),users=state.users.filter(u=>(u.username+" "+u.name+" "+u.bio).toLowerCase().includes(q)),posts=state.posts.filter(p=>(p.caption+" "+(p.hashtags||"")).toLowerCase().includes(q));
+ mount(`<div class="view-title"><h1>Search</h1>${q?`<button class="btn secondary" onclick="state.search='';render()">Clear</button>`:""}</div>
+ <div class="card" style="padding:8px">${users.length?users.map(u=>`<div class="person" style="padding:7px 5px">${avatar(u)}<div class="grow"><b>${esc(u.name)}</b><div class="small">@${esc(u.username)}</div><div class="small">${esc(u.bio)}</div></div><button class="follow ${isFollowing(u.id)?"secondary":""}" onclick="toggleFollow('${u.id}')">${isFollowing(u.id)?"Following":"Follow"}</button></div>`).join(""):`<div class="empty">${icon("user-search",28)}<p>No people found.</p></div>`}</div>
+ <div class="view-title"><h1>Posts</h1></div><div class="grid card" style="padding:4px">${posts.length?posts.map(p=>`<img src="${esc(p.media_url)}" onclick="openPost('${p.id}')">`).join(""):`<div class="empty" style="grid-column:1/-1">${icon("search-x",28)}<p>No matching posts.</p></div>`}</div>`);
+}
+function openPost(id){const p=state.posts.find(x=>x.id===id);if(!p)return;state.view="home";render();setTimeout(()=>document.getElementById("post-"+id)?.scrollIntoView({behavior:"smooth"}),100)}
+function renderExplore(){
+ const posts=[...state.posts].sort(()=>Math.random()-.5);
+ mount(`<div class="view-title"><h1>Explore</h1><button class="btn secondary" onclick="setView('search')">${icon("search",16)} Find people</button></div><div class="grid">${posts.map((p,i)=>`<img class="${i%7===0?"wide":""}" src="${esc(p.media_url)}" onclick="openPost('${p.id}')">`).join("")}</div>`);
+}function renderProfile(){
+ const u=state.user, own=state.posts.filter(p=>p.user_id===u.id), saved=state.posts.filter(p=>state.saved.includes(p.id));
+ mount(`<div class="card profile-card"><div class="profile-top">${avatar(u,"avatar xl")}<div class="profile-info"><h1>${esc(u.name)}</h1><div class="small">@${esc(u.username)}</div><p>${esc(u.bio||"Add a bio from Edit profile.")}</p><div class="stats"><div><b>${own.length}</b><span>Posts</span></div><div><b>${u.followers||0}</b><span>Followers</span></div><div><b>${u.following||0}</b><span>Following</span></div></div><button class="btn secondary" onclick="openEditProfile()">Edit profile</button></div></div>
+ <div class="tabs"><button class="active" onclick="profileTab(this,'posts')">${icon("grid-3x3",16)} Posts</button><button onclick="profileTab(this,'saved')">${icon("bookmark",16)} Saved</button><button onclick="profileTab(this,'tagged')">${icon("users",16)} Tagged</button></div>
+ <div id="profileGrid" style="margin-top:4px">${profileGrid(own)}</div></div>`);
+}
+function profileGrid(arr){return arr.length?`<div class="grid">${arr.map(p=>`<img src="${esc(p.media_url)}" onclick="openPost('${p.id}')">`).join("")}</div>`:`<div class="empty">${icon("camera",32)}<h3>No posts yet</h3><p>Share your first photo or video.</p><button class="btn" onclick="openCreateModal()">Create post</button></div>`}
+function profileTab(btn,type){document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");const arr=type==="saved"?state.posts.filter(p=>state.saved.includes(p.id)):type==="tagged"?[]:state.posts.filter(p=>p.user_id===state.user.id);document.getElementById("profileGrid").innerHTML=type==="tagged"?`<div class="empty">${icon("users",30)}<p>Tagged posts will appear here.</p></div>`:profileGrid(arr);lucide.createIcons()}
+function renderNotifications(){
+ const ns=state.notifications.filter(n=>n.to_user_id===state.user.id);
+ state.notifications.forEach(n=>{if(n.to_user_id===state.user.id)n.read=true});saveLocal();
+ mount(`<div class="view-title"><h1>Notifications</h1><button class="btn secondary" onclick="state.notifications.forEach(n=>{if(n.to_user_id===state.user.id)n.read=true});saveLocal();render()">Mark all read</button></div><div class="card">${ns.length?ns.map(n=>{const u=userById(n.from_user_id);return `<div class="notification ${n.read?"":"unread"}">${avatar(u,"avatar sm")}<div class="grow"><p><b>${esc(u.username)}</b> ${esc(n.text)}</p><small>${formatTime(n.created_at)}</small></div>${n.type==="follow"?`<button class="follow ${isFollowing(u.id)?"secondary":""}" onclick="toggleFollow('${u.id}')">${isFollowing(u.id)?"Following":"Follow"}</button>`:""}</div>`}).join(""):`<div class="empty">${icon("bell-off",30)}<h3>No notifications</h3><p>Likes, comments and new follows will appear here.</p></div>`}</div>`);
+}
+function renderMessages(){
+ const chats=state.conversations.filter(c=>c.user_ids?.includes(state.user.id));
+ if(state.selectedChat){renderChat(state.selectedChat);return}
+ mount(`<div class="view-title"><h1>Messages</h1><button class="btn" onclick="newChat()">New chat</button></div><div class="card">${chats.length?chats.map(c=>{const other=userById(c.user_ids.find(x=>x!==state.user.id));const last=state.messages.filter(m=>m.conversation_id===c.id).slice(-1)[0];return `<div class="chat-item" onclick="openChat('${c.id}')">${avatar(other)}<div class="grow"><b>${esc(other.name)}</b><div class="small">@${esc(other.username)}${last?" · "+esc(last.text):""}</div></div>${last?`<small>${formatTime(last.created_at)}</small>`:""}</div>`}).join(""):`<div class="empty">${icon("message-circle",32)}<h3>No conversations</h3><p>Search for someone and start a chat.</p><button class="btn" onclick="setView('search')">Find people</button></div>`}</div>`);
+}
+function newChat(){state.view="search";state.search="";render();toast("Search for a person to start a conversation")}
+function getOrCreateChat(otherId){let c=state.conversations.find(c=>c.user_ids.includes(state.user.id)&&c.user_ids.includes(otherId));if(!c){c={id:uid("chat_"),user_ids:[state.user.id,otherId],created_at:Date.now()};state.conversations.push(c)}return c}
+function startChat(otherId){const c=getOrCreateChat(otherId);state.view="messages";state.selectedChat=c.id;saveLocal();render()}
+function openChat(id){state.selectedChat=id;render()}
+function renderChat(id){
+ const c=state.conversations.find(x=>x.id===id),other=userById(c.user_ids.find(x=>x!==state.user.id)),msgs=state.messages.filter(m=>m.conversation_id===id);
+ mount(`<div class="card chat-layout"><div class="chat-list hidden"></div><div class="chat-window"><div class="chat-head"><button class="iconbtn" onclick="state.selectedChat=null;render()">${icon("arrow-left")}</button>${avatar(other,"avatar sm")}<div><b>${esc(other.name)}</b><div class="small">@${esc(other.username)}</div></div></div><div class="messages" id="messages">${msgs.map(m=>`<div class="bubble ${m.sender_id===state.user.id?"mine":""}">${esc(m.text)}<time>${new Date(m.created_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}${m.sender_id===state.user.id?" · Read":""}</time></div>`).join("")}</div><form class="chat-input" onsubmit="sendMessage(event,'${id}')"><input id="chatText" autocomplete="off" placeholder="Message ${esc(other.name)}..."><button>${icon("send",18)}</button></form></div></div>`);setTimeout(()=>{const m=document.getElementById("messages");if(m)m.scrollTop=m.scrollHeight},0);
+}
+function sendMessage(ev,id){ev.preventDefault();const e=document.getElementById("chatText"),text=e.value.trim();if(!text)return;state.messages.push({id:uid("m_"),conversation_id:id,sender_id:state.user.id,text,created_at:Date.now(),read:true});saveLocal();renderChat(id);setTimeout(()=>{const c=state.conversations.find(x=>x.id===id),other=c.user_ids.find(x=>x!==state.user.id);if(other){state.messages.push({id:uid("m_"),conversation_id:id,sender_id:other,text:"Thanks for messaging me! 👋",created_at:Date.now(),read:true});saveLocal();renderChat(id)}},900)}
+function renderReels(){
+ const videos=state.posts.filter(p=>p.media_type==="video");
+ mount(`<div class="view-title"><h1>Reels</h1><button class="btn secondary" onclick="openCreateModal('video')">${icon("plus",16)} Add video</button></div>${videos.length?videos.map(p=>`<div class="reel"><video src="${esc(p.media_url)}" playsinline loop onclick="this.paused?this.play():this.pause()"></video><div class="reel-gradient"></div><div class="reel-info"><b>@${esc(userById(p.user_id).username)}</b><p>${esc(p.caption||"")}</p></div><div class="reel-actions"><button onclick="toggleLike('${p.id}')">${icon("heart")}</button><button onclick="focusComment('${p.id}')">${icon("message-circle")}</button><button onclick="sharePost('${p.id}')">${icon("send")}</button><button onclick="this.closest('.reel').querySelector('video').muted=!this.closest('.reel').querySelector('video').muted">${icon("volume-2")}</button></div></div>`).join(""):`<div class="card empty">${icon("clapperboard",35)}<h3>No reels yet</h3><p>Upload a video to start your reel feed.</p><button class="btn" onclick="openCreateModal('video')">Upload video</button></div>`}`);
+}
+function renderSettings(){
+ mount(`<div class="view-title"><h1>Settings</h1></div><div class="card" style="padding:5px">
+ ${settingRow("user-round","Edit profile","Change your name, username, bio and photo","openEditProfile()")}
+ ${settingRow("lock","Privacy","Control who can connect with you","toast('Privacy controls are ready for cloud mode')")}
+ ${settingRow("bell","Notifications","Likes, comments and follows","toast('Notification settings saved locally')")}
+ ${settingRow(state.theme==="dark"?"sun":"moon","Appearance",state.theme==="dark"?"Dark mode":"Light mode","toggleTheme()")}
+ ${settingRow("download","Export my data","Download your local Connectly data","exportData()")}
+ ${settingRow("log-out","Log out","Sign out of this device","logout()")}
+ </div><div class="card" style="padding:18px"><b>Connection status</b><p class="small">${HAS_BACKEND?"Supabase cloud mode is configured.":"Browser-only demo mode is active. Configure Supabase to share accounts, posts and messages across users."}</p>${!HAS_BACKEND?`<button class="btn" onclick="toast('Add Supabase settings at the top of index.html, then redeploy')">Learn about cloud mode</button>`:""}</div>`);
+}
+function settingRow(ic,title,sub,action){return `<button onclick="${action}" style="width:100%;background:transparent;color:var(--text);display:flex;align-items:center;gap:13px;padding:15px;border-bottom:1px solid var(--border);text-align:left">${icon(ic)}<span style="flex:1"><b>${title}</b><small style="display:block;color:var(--muted);margin-top:3px">${sub}</small></span>${icon("chevron-right",17)}</button>`}
+function toggleTheme(){state.theme=state.theme==="dark"?"light":"dark";localStorage.setItem("connectly_theme",state.theme);render()}
+function exportData(){const blob=new Blob([JSON.stringify({user:state.user,posts:state.posts,comments:state.comments,follows:state.follows,messages:state.messages},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="connectly-data.json";a.click();URL.revokeObjectURL(a.href);toast("Data exported")}
+function openCreateModal(kind="image"){
+ const old=document.getElementById("modal");if(old)old.remove();
+ const m=document.createElement("div");m.id="modal";m.className="modal";m.innerHTML=`<div class="modalbox"><div class="modalhead"><h2>Create a post</h2><button class="iconbtn" onclick="closeModal()">${icon("x")}</button></div><div class="modalbody">
+ <div class="field"><label>Photo or video</label><input id="mediaFile" type="file" accept="image/*,video/*" onchange="previewFile(event)"></div><div id="mediaPreview"></div>
+ <div class="field"><label>Caption</label><textarea id="postCaption" placeholder="Share what you're thinking..."></textarea></div>
+ <div class="field"><label>Hashtags</label><input id="postTags" placeholder="#travel #connectly"></div>
+ <div class="field"><label>Location</label><input id="postLocation" placeholder="Add a location"></div>
+ </div><div class="modalfoot"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="publishPost()">Publish</button></div></div>`;
+ document.body.appendChild(m);lucide.createIcons();if(kind==="video")document.getElementById("mediaFile").accept="video/*";
+}
+function previewFile(ev){const f=ev.target.files?.[0];if(!f)return;state.pendingFile=f;const url=URL.createObjectURL(f);document.getElementById("mediaPreview").innerHTML=f.type.startsWith("video/")?`<video class="preview" src="${url}" controls></video>`:`<img class="preview" src="${url}" alt="Preview">`}
+function fileToDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)})}
+async function publishPost(){
+ const f=state.pendingFile,caption=document.getElementById("postCaption")?.value.trim(),hashtags=document.getElementById("postTags")?.value.trim(),location=document.getElementById("postLocation")?.value.trim();
+ if(!f){toast("Choose an image or video first");return}
+ let url;
+ if(HAS_BACKEND){
+   const path=`${state.user.id}/${Date.now()}-${f.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+   const {error}=await sb.storage.from("media").upload(path,f,{upsert:false});
+   if(error){toast(error.message);return}
+   const {data}=sb.storage.from("media").getPublicUrl(path);url=data.publicUrl;
+ }else url=await fileToDataURL(f);
+ const p={id:uid("p_"),user_id:state.user.id,caption,hashtags,location,media_url:url,media_type:f.type.startsWith("video/")?"video":"image",created_at:Date.now(),likes:0,liked:false,saved:false,comments_count:0};
+ state.posts.unshift(p);saveLocal();closeModal();state.pendingFile=null;toast("Your post is live!");render();
+}
+function closeModal(){document.getElementById("modal")?.remove();state.pendingFile=null}
+function openEditProfile(){
+ const m=document.createElement("div");m.id="modal";m.className="modal";m.innerHTML=`<div class="modalbox"><div class="modalhead"><h2>Edit profile</h2><button class="iconbtn" onclick="closeModal()">${icon("x")}</button></div><div class="modalbody">
+ <div class="field"><label>Name</label><input id="editName" value="${esc(state.user.name||"")}"></div><div class="field"><label>Username</label><input id="editUsername" value="${esc(state.user.username||"")}"></div><div class="field"><label>Bio</label><textarea id="editBio">${esc(state.user.bio||"")}</textarea></div><div class="field"><label>Profile picture</label><input id="editAvatar" type="file" accept="image/*"></div>
+ </div><div class="modalfoot"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveProfile()">Save profile</button></div></div>`;document.body.appendChild(m);lucide.createIcons();
+}
+async function saveProfile(){
+ const name=document.getElementById("editName").value.trim()||"Connectly User",username=document.getElementById("editUsername").value.trim().toLowerCase(),bio=document.getElementById("editBio").value.trim(),file=document.getElementById("editAvatar").files?.[0];
+ if(!/^[a-z0-9_.]{3,30}$/.test(username)){toast("Username: 3–30 letters, numbers, _ or .");return}
+ let avatarUrl=state.user.avatar||"";
+ if(file){
+   if(HAS_BACKEND){const path=`${state.user.id}/avatar-${Date.now()}`;const {error}=await sb.storage.from("avatars").upload(path,file,{upsert:true});if(error){toast(error.message);return}avatarUrl=sb.storage.from("avatars").getPublicUrl(path).data.publicUrl}
+   else avatarUrl=await fileToDataURL(file);
+ }
+ state.user={...state.user,name,username,bio,avatar:avatarUrl};const u=state.users.find(x=>x.id===state.user.id);if(u)Object.assign(u,state.user);else state.users.push({...state.user,followers:0,following:0});
+ if(HAS_BACKEND){const {error}=await sb.from("profiles").upsert({id:state.user.id,username,name,bio,avatar_url:avatarUrl});if(error){toast(error.message);return}}
+ saveLocal();closeModal();toast("Profile updated");render();
+}
+function openCreateStory(){
+ const m=document.createElement("div");m.id="modal";m.className="modal";m.innerHTML=`<div class="modalbox"><div class="modalhead"><h2>Add to your story</h2><button class="iconbtn" onclick="closeModal()">${icon("x")}</button></div><div class="modalbody"><div class="field"><label>Story image</label><input id="storyFile" type="file" accept="image/*" onchange="previewStory(event)"></div><div id="storyPreview"></div></div><div class="modalfoot"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="publishStory()">Add story</button></div></div>`;document.body.appendChild(m);lucide.createIcons();
+}
+function previewStory(ev){const f=ev.target.files?.[0];if(f)document.getElementById("storyPreview").innerHTML=`<img class="preview" src="${URL.createObjectURL(f)}">`}
+async function publishStory(){const f=document.getElementById("storyFile").files?.[0];if(!f){toast("Choose an image");return}let url;if(HAS_BACKEND){const path=`${state.user.id}/story-${Date.now()}`;const {error}=await sb.storage.from("media").upload(path,f);if(error){toast(error.message);return}url=sb.storage.from("media").getPublicUrl(path).data.publicUrl}else url=await fileToDataURL(f);state.stories.unshift({id:uid("s_"),user_id:state.user.id,media_url:url,created_at:Date.now(),viewed:false});saveLocal();closeModal();toast("Story added");render()}
+function openStory(id){
+ const idx=state.stories.findIndex(s=>s.id===id);if(idx<0)return;state.selectedStory=idx;const s=state.stories[idx];s.viewed=true;saveLocal();
+ const v=document.createElement("div");v.id="storyViewer";v.className="storyviewer";document.body.appendChild(v);renderStoryViewer();startStoryTimer();
+}
+function renderStoryViewer(){
+ const s=state.stories[state.selectedStory];if(!s)return closeStory();const u=userById(s.user_id);
+ document.getElementById("storyViewer").innerHTML=`<div class="story-card"><div class="storybar">${state.stories.map((x,i)=>`<div class="storyseg ${i<state.selectedStory?"done":""}" data-i="${i}"><span></span></div>`).join("")}</div><img src="${esc(s.media_url)}"><div class="storytop">${avatar(u,"avatar sm")}<b>${esc(u.username)}</b><span class="grow">${formatTime(s.created_at)}</span><button onclick="closeStory()">${icon("x")}</button></div><div class="storyclick prev" onclick="prevStory()"></div><div class="storyclick next" onclick="nextStory()"></div></div>`;lucide.createIcons();const seg=document.querySelector(`.storyseg[data-i="${state.selectedStory}"] span`);if(seg){seg.style.transition="width 5s linear";setTimeout(()=>seg.style.width="100%",20)}
+}
+function startStoryTimer(){clearTimeout(state.storyTimer);state.storyTimer=setTimeout(nextStory,5000)}
+function nextStory(){if(state.selectedStory<state.stories.length-1){state.selectedStory++;state.stories[state.selectedStory].viewed=true;renderStoryViewer();startStoryTimer()}else closeStory()}
+function prevStory(){if(state.selectedStory>0){state.selectedStory--;renderStoryViewer();startStoryTimer()}}
+function closeStory(){clearTimeout(state.storyTimer);document.getElementById("storyViewer")?.remove()}
+window.addEventListener("keydown",e=>{if(e.key==="Escape"){closeModal();closeStory()}if(document.getElementById("storyViewer")){if(e.key==="ArrowRight")nextStory();if(e.key==="ArrowLeft")prevStory()}});
+
+async function syncCloud(){
+ if(!HAS_BACKEND||!state.user)return;
+ try{
+  const {data:ps}=await sb.from("posts").select("*").order("created_at",{ascending:false}).limit(100);
+  if(ps)state.posts=ps.map(p=>({...p,liked:false,saved:false}));
+  const {data:us}=await sb.from("profiles").select("id,username,name,bio,avatar_url");
+  if(us)state.users=us.map(u=>({id:u.id,username:u.username,name:u.name,bio:u.bio,avatar:u.avatar_url||"",followers:0,following:0}));
+  const {data:fs}=await sb.from("follows").select("*");if(fs)state.follows=fs;
+  const {data:cs}=await sb.from("comments").select("*").order("created_at",{ascending:true});if(cs)state.comments=cs;
+  saveLocal();render();
+ }catch(e){console.warn(e)}
+}
+window.addEventListener("load",async()=>{
+ loadLocal();applyTheme();
+ if(HAS_BACKEND){
+   const {data}=await sb.auth.getSession();if(data.session){await loadCloudUser(data.session.user);await syncCloud()}
+   sb.auth.onAuthStateChange(async(_e,s)=>{if(s&&!state.user){await loadCloudUser(s.user);render()}});
+ }
+ render();
+});
+</script>
+</body>
+</html>
