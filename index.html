@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Connectly</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f4f4;
+      color: #111;
+    }
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 65px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5%;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: bold;
+      color: #6c4cff;
+    }
+
+    .search {
+      width: 35%;
+      padding: 11px 18px;
+      border: none;
+      outline: none;
+      border-radius: 25px;
+      background: #f1f1f1;
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 18px;
+      font-size: 22px;
+    }
+
+    .header-icons span {
+      cursor: pointer;
+    }
+
+    /* MAIN */
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 25px 15px;
+
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 25px;
+    }
+
+    /* STORIES */
+    .stories {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+    }
+
+    .story {
+      min-width: 70px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .story img {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #7b5cff;
+      padding: 2px;
+    }
+
+    .story p {
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    /* CREATE POST */
+    .create-post {
+      background: white;
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 15px;
+    }
+
+    .post-input {
+      width: 100%;
+      padding: 13px 18px;
+      border: none;
+      outline: none;
+      background: #f1f1f1;
+      border-radius: 25px;
+      font-size: 15px;
+    }
+
+    .post-options {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+    }
+
+    .post-options button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* POST */
+    .post {
+      background: white;
+      margin-top: 20px;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px;
+    }
+
+    .profile {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+    }
+
+    .username {
+      font-weight: bold;
+    }
+
+    .post-image {
+      width: 100%;
+      display: block;
+      max-height: 600px;
+      object-fit: cover;
+    }
+
+    /* ACTION BUTTONS */
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 12px 15px;
+    }
+
+    .actions button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 25px;
+    }
+
+    .save {
+      margin-left: auto;
+    }
+
+    .caption {
+      padding: 0 15px 18px;
+    }
+
+    .likes {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      height: fit-content;
+    }
+
+    .suggestion {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .suggestion img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+    }
+
+    .follow {
+      margin-left: auto;
+      border: none;
+      background: none;
+      color: #6c4cff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* MOBILE */
+    @media (max-width: 750px) {
+
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .search {
+        display: none;
+      }
+
+      .header-icons {
+        gap: 12px;
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+
+    <div class="logo">
+      Connectly
+    </div>
+
+    <input
+      class="search"
+      type="text"
+      placeholder="Search people..."
+    >
+
+    <div class="header-icons">
+      <span>🏠</span>
+      <span>💬</span>
+      <span>🔔</span>
+      <span>👤</span>
+    </div>
+
+  </header>
+
+
+  <!-- MAIN -->
+  <div class="container">
+
+    <main>
+
+      <!-- STORIES -->
+      <div class="stories">
+
+        <div class="story">
+          <img src="https://i.pravatar.cc/100?img=1">
+          <p>Your Story</p>
+        </div>
+
+        <div class="story">
+          <img src="https://i.pravatar.cc/100?img=2">
+          <p>Rahul</p>
+        </div>
+
+        <div class="story">
+          <img src="https://i.pravatar.cc/100?img=3">
+          <p>Aman</p>
+        </div>
+
+        <div class="story">
+          <img src="https://i.pravatar.cc/100?img=4">
+          <p>Priya</p>
+        </div>
+
+        <div class="story">
+          <img src="https://i.pravatar.cc/100?img=5">
+          <p>Riya</p>
+        </div>
+
+      </div>
+
+
+      <!-- CREATE POST -->
+      <div class="create-post">
+
+        <input
+          class="post-input"
+          type="text"
+          placeholder="What's on your mind?"
+        >
+
+        <div class="post-options">
+
+          <button>📷 Photo</button>
+
+          <button>🎥 Video</button>
+
+          <button>😊 Feeling</button>
+
+        </div>
+
+      </div>
+
+
+      <!-- POST -->
+      <div class="post">
+
+        <div class="post-header">
+
+          <img
+            class="profile"
+            src="https://i.pravatar.cc/100?img=12"
+          >
+
+          <div>
+            <div class="username">Alex</div>
+            <small>2 hours ago</small>
+          </div>
+
+        </div>
+
+
+        <img
+          class="post-image"
+          src="https://picsum.photos/800/600"
+        >
+
+
+        <!-- ACTIONS -->
+        <div class="actions">
+
+          <button onclick="likePost(this)">
+            ♡
+          </button>
+
+          <button>
+            💬
+          </button>
+
+          <button>
+            ↗️
+          </button>
+
+          <button class="save">
+            🔖
+          </button>
+
+        </div>
+
+
+        <!-- CAPTION -->
+        <div class="caption">
+
+          <div class="likes">
+            1,245 likes
+          </div>
+
+          <p>
+            <b>Alex</b>
+            Beautiful day! 🌅
+          </p>
+
+        </div>
+
+      </div>
+
+    </main>
+
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <h3>Suggested for you</h3>
+
+
+      <div class="suggestion">
+
+        <img src="https://i.pravatar.cc/100?img=20">
+
+        <b>John</b>
+
+        <button class="follow">
+          Follow
+        </button>
+
+      </div>
+
+
+      <div class="suggestion">
+
+        <img src="https://i.pravatar.cc/100?img=21">
+
+        <b>Mike</b>
+
+        <button class="follow">
+          Follow
+        </button>
+
+      </div>
+
+
+      <div class="suggestion">
+
+        <img src="https://i.pravatar.cc/100?img=22">
+
+        <b>Sarah</b>
+
+        <button class="follow">
+          Follow
+        </button>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+
+  <!-- JAVASCRIPT -->
+  <script>
+
+    function likePost(button) {
+
+      if (button.innerHTML.trim() === "♡") {
+
+        button.innerHTML = "❤️";
+
+      } else {
+
+        button.innerHTML = "♡";
+
+      }
+
+    }
+
+
+    // Follow button
+    document.querySelectorAll(".follow").forEach(function(button) {
+
+      button.addEventListener("click", function() {
+
+        if (button.innerText === "Follow") {
+
+          button.innerText = "Following";
+
+        } else {
+
+          button.innerText = "Follow";
+
+        }
+
+      });
+
+    });
+
+  </script>
+
+</body>
+  </html>
